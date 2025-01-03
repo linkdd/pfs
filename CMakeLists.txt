@@ -2,6 +2,13 @@ cmake_minimum_required (VERSION 3.5)
 
 project (pfs)
 
+
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+  set(pfs_SUBPROJECT OFF)
+else()
+  set(pfs_SUBPROJECT ON)
+endif()
+
 # ------------------------------------------------------------------------
 # Flags that are expected to be shared when added as sub-directory
 # ------------------------------------------------------------------------
@@ -17,6 +24,8 @@ if (NOT CMAKE_BUILD_TYPE)
     message (STATUS "Build type not specified. Set by default to DEBUG!")
     set (CMAKE_BUILD_TYPE Debug)
 endif ()
+
+option(pfs_DISABLE_INSTALL "Disable installation of pfs" ${pfs_SUBPROJECT})
 
 # ------------------------------------------------------------------------
 # Flags that are NOT expected to be shared when added as sub-directory
@@ -98,29 +107,31 @@ set (pfs_PACKAGE_INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAM
 
 set (pfs_EXPORT_NAME ${PROJECT_NAME}Targets)
 
-configure_package_config_file(
-    ${pfs_PACKAGE_CONFIG_IN}
-    ${pfs_PACKAGE_CONFIG_OUT}
-    INSTALL_DESTINATION ${pfs_PACKAGE_INSTALL_DESTINATION}
-)
+if (NOT pfs_DISABLE_INSTALL)
+    configure_package_config_file(
+        ${pfs_PACKAGE_CONFIG_IN}
+        ${pfs_PACKAGE_CONFIG_OUT}
+        INSTALL_DESTINATION ${pfs_PACKAGE_INSTALL_DESTINATION}
+    )
 
-install(
-    TARGETS ${PROJECT_NAME}
-    EXPORT ${pfs_EXPORT_NAME}
-)
+    install(
+        TARGETS ${PROJECT_NAME}
+        EXPORT ${pfs_EXPORT_NAME}
+    )
 
-install(
-    EXPORT ${pfs_EXPORT_NAME}
-    FILE ${pfs_PACKAGE_CONFIG}
-    DESTINATION ${pfs_PACKAGE_INSTALL_DESTINATION}
-)
+    install(
+        EXPORT ${pfs_EXPORT_NAME}
+        FILE ${pfs_PACKAGE_CONFIG}
+        DESTINATION ${pfs_PACKAGE_INSTALL_DESTINATION}
+    )
 
-install(
-    DIRECTORY include/
-    DESTINATION include
-)
+    install(
+        DIRECTORY include/
+        DESTINATION include
+    )
 
-install(
-    FILES package.xml
-    DESTINATION share/${PROJECT_NAME}
-)
+    install(
+        FILES package.xml
+        DESTINATION share/${PROJECT_NAME}
+    )
+endif()
